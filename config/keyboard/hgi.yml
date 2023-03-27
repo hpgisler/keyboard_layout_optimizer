@@ -100,25 +100,25 @@ base_layout:
 
   # for GroupedLayoutGenerator:
   # number of consecutive symbols from base layout to group together generating a layout
-  grouped_layers: 2
+  grouped_layers: 1
 
   modifiers:
-    - Left:
-        type: hold
-        value: [[7,4]]
-      Right:
-        type: hold
-        value: [[7,4]]
+#    - Left:
+#        type: hold
+#        value: [[7,4]]
+#      Right:
+#        type: hold
+#        value: [[7,4]]
     - Left:
         type: hold
         value: [[13,4]]
       Right:
         type: hold
         value: [[13,4]]
-    - Left:
-        type: hold
-        value: [[7,4], [13,4]]
-      Right:
-        type: hold
-        value: [[7,4], [13,4]]
+#    - Left:
+#        type: hold
+#        value: [[7,4], [13,4]]
+#      Right:
+#        type: hold
+#        value: [[7,4], [13,4]]
 
