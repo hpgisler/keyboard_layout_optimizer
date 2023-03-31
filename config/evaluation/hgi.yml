@@ -77,14 +77,14 @@ metrics:
       # Intended factors for finger load. Thumb values are ignored.
       intended_loads:
         [Left, Pinky]: 1.0
-        [Left, Ring]: 1.6
+        [Left, Ring]: 1.8
         [Left, Middle]: 2.0
         [Left, Index]: 2.0
         [Left, Thumb]: 2.0
         [Right, Thumb]: 2.0
         [Right, Index]: 2.0
         [Right, Middle]: 2.0
-        [Right, Ring]: 1.6
+        [Right, Ring]: 1.8
         [Right, Pinky]: 1.0
 
   # Each hand's load shall be close to 50%
@@ -160,40 +160,64 @@ metrics:
 
   # Put costs on some key combinations that are hard to describe otherwise
   manual_bigram_penalty:
-    enabled: false
-    weight: 2100.0
+    enabled: true
+    weight: 10.0
     normalization:
       type: weight_found
       value: 1.0
     params:
       # if mirrored bigrams to the ones in "matrix_positions" below shall be added automatically
-      add_mirrored: true
+      add_mirrored: false
 
       # key positions as matrix positions and the corresponding costs
       # the format is [column, row]
       # [from_position, to_position]: weight
       matrix_positions:
+
+      # hgi
+      # [         [3,2]:5, [4,2]:4, [5,2]:7,     [14,2]:8, [15,2]:4, [16,2]:4          ]
+      # [[2,3]:6, [3,3]:3, [4,3]:2, [5,3]:3,     [14,3]:9, [15,3]:5, [16,3]:3 ,[17,3]:4]
+
+        [[13,4], [3,2]]: 5 
+        [[13,4], [4,2]]: 4
+        [[13,4], [5,2]]: 7
+
+        [[13,4], [2,3]]: 6
+        [[13,4], [3,3]]: 3
+        [[13,4], [4,3]]: 2
+        [[13,4], [5,3]]: 3
+
+
+        [[13,4], [14,2]]: 8 
+        [[13,4], [15,2]]: 4
+        [[13,4], [16,2]]: 4
+
+        [[13,4], [14,3]]: 9
+        [[13,4], [15,3]]: 5
+        [[13,4], [16,3]]: 3
+        [[13,4], [17,3]]: 4
+
         # NOTE: in contrast to ArneBab's layout, we skip one column in rows 0, 1, 2 (not in row 3)
-        [[3, 1], [2, 3]]: 1      # QWERTZ: wy
-        [[3, 2], [2, 3]]: 0.3    # QWERTZ: sy
-        [[4, 2], [3, 3]]: 0.2    # QWERTZ: dx
-        [[2, 1], [3, 3]]: 0.2    # QWERTZ: qx
-        [[2, 1], [4, 3]]: 0.1    # QWERTZ: qc
+        # [[3, 1], [2, 3]]: 1      # QWERTZ: wy
+        # [[3, 2], [2, 3]]: 0.3    # QWERTZ: sy
+        # [[4, 2], [3, 3]]: 0.2    # QWERTZ: dx
+        # [[2, 1], [3, 3]]: 0.2    # QWERTZ: qx
+        # [[2, 1], [4, 3]]: 0.1    # QWERTZ: qc
 
-        [[17, 3], [13, 1]]: 0.1   # QWERTZ: -z
-        [[2, 3], [6, 1]]: 0.1    # QWERTZ: yt
+        # [[17, 3], [13, 1]]: 0.1   # QWERTZ: -z
+        # [[2, 3], [6, 1]]: 0.1    # QWERTZ: yt
 
-        [[2, 3], [5, 3]]: -0.01  # QWERTZ: yv
-        [[14, 3], [17, 3]]: -0.01 # QWERTZ: m-
+        # [[2, 3], [5, 3]]: -0.01  # QWERTZ: yv
+        # [[14, 3], [17, 3]]: -0.01 # QWERTZ: m-
 
-        # Finger repeats on same key
-        # pinkies
-        [[2, 1], [2, 1]]: 0.5
-        [[2, 2], [2, 2]]: 0.3
-        [[2, 3], [2, 3]]: 0.5
-        [[17, 1], [17, 1]]: 0.5
-        [[17, 2], [17, 2]]: 0.3
-        [[17, 3], [17, 3]]: 0.5
+        # # Finger repeats on same key
+        # # pinkies
+        # [[2, 1], [2, 1]]: 0.5
+        # [[2, 2], [2, 2]]: 0.3
+        # [[2, 3], [2, 3]]: 0.5
+        # [[17, 1], [17, 1]]: 0.5
+        # [[17, 2], [17, 2]]: 0.3
+        # [[17, 3], [17, 3]]: 0.5
 
   # Depending on which fingers of the same hand are used to hit the keys of a bigram,
   # how many rows were crossed and in which direction the movement occurs, costs are
