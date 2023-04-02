@@ -22,7 +22,7 @@ keyboard:
   key_costs:
     - [     5,  4,  7,                     7,  4,  5    ]
     - [ 6,  3,  2,  3,                     3,  2,  3,  6]
-    - [                  5,  7,    7,  5                ]
+    - [                 7,  9,    9,  7                ]
 
   unbalancing_positions:
     - [          [0,   0], [0,  0], [0,   0],                  [0,   0], [0, 0], [0,   0]          ]
@@ -68,30 +68,30 @@ keyboard:
 base_layout:
   keys:
     # Row 2
-    - - ["l", "v"]
-      - ["d", "m"]
-      - ["g", "w"]
-      - ["h", "f"]
-      - ["u", ","]
-      - ["o", "z"]
+    - - ["l", "v", "s"]
+      - ["d", "m", "-"]
+      - ["g", "w", "ä"]
+      - ["h", "f", "ö"]
+      - ["u", ",", "ü"]
+      - ["o", "z", "'"]
     # Row 3 (home row)
-    - - ["i", "q"]
-      - ["s", "j"]
-      - ["t", "k"]
-      - ["r", "p"]
-      - ["n", "b"]
-      - ["e", "."]
-      - ["a", "x"]
-      - ["c", "y"]
-    # Row 4, containing the spacebar
-    - - [" "]
+    - - ["⇧", "⇧", "⇧"]
+      - ["r", "p", "t"]
+      - ["n", "b", "k"]
+      - ["i", "q", "/"]
+      - ["ç", "j", "?"]
+      - ["e", ".", "c"]
+      - ["a", "x", "y"]
+      - ["⇧", "⇧", "⇧"]
+    # Row 4, containing the modifiiers
+    - - ["⇘"]
       - ["⇧"]
       - ["\n"]
       - ["⇙"]
 
   fixed_keys:
     - [         false, false, false,                  false, false, false       ]
-    - [  false, false, false, false,                  false, false, false, false]
+    - [  true,  false, false, false,                  false, false, false, true ]
     - [                        true,  true,    true,  true                      ]
 
   # for NeoLayoutGenerator:
@@ -103,18 +103,20 @@ base_layout:
   grouped_layers: 1
 
   modifiers:
-#    - Left:
-#        type: hold
-#        value: [[7,4]]
-#      Right:
-#        type: hold
-#        value: [[7,4]]
+  # right thumb home position:
     - Left:
         type: hold
         value: [[13,4]]
       Right:
         type: hold
         value: [[13,4]]
+  # left thumb home position:
+    - Left:
+        type: hold
+        value: [[6,4]]
+      Right:
+        type: hold
+        value: [[6,4]]
 #    - Left:
 #        type: hold
 #        value: [[7,4], [13,4]]
