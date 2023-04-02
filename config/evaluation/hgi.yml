@@ -320,19 +320,19 @@ metrics:
   # movement") or if there is a directional change.
   no_handswitch_in_trigram:
     enabled: true
-    weight: 400.0
+    weight: 200.0
     normalization:
       type: weight_found
       value: 1.0
     params:
       # Count this factor if there is a direction change in the trigram
-      factor_with_direction_change: 2.0
+      factor_with_direction_change: 4.0
       # Count this factor if there is no direction change in the trigram
       factor_without_direction_change: 1.0
       # Count this factor if all characters of the trigram lie on the same key
       factor_same_key: 0.0
       # Count this factor if the trigram contains at least finger repeats
-      factor_contains_finger_repeat: 2.0
+      factor_contains_finger_repeat: 1.0
       # Count this factor if the starting and end key are the same (but no finger repeat)
       factor_same_key_start_end: 0.5
       # The trigram contains the index finger at least once
