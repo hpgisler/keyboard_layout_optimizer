@@ -161,7 +161,7 @@ metrics:
   # Put costs on some key combinations that are hard to describe otherwise
   manual_bigram_penalty:
     enabled: true
-    weight: 10.0
+    weight: 5.0
     normalization:
       type: weight_found
       value: 1.0
