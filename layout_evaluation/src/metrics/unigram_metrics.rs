@@ -9,6 +9,7 @@ pub mod finger_balance;
 pub mod hand_disbalance;
 pub mod key_costs;
 pub mod row_loads;
+pub mod modifier_usage;
 
 /// UnigramMetric is a trait for metrics that iterate over weighted unigrams.
 pub trait UnigramMetric: Send + Sync + UnigramMetricClone + fmt::Debug {
@@ -35,11 +36,11 @@ pub trait UnigramMetric: Send + Sync + UnigramMetricClone + fmt::Debug {
         total_weight: Option<f64>,
         layout: &Layout,
     ) -> (f64, Option<String>) {
-        let show_worst: bool = env::var("show_worst")
+        let show_worst: bool = env::var("SHOW_WORST")
             .ok()
             .and_then(|s| s.parse().ok())
             .unwrap_or(true);
-        let n_worst: usize = env::var("n_worst")
+        let n_worst: usize = env::var("N_WORST")
             .ok()
             .and_then(|s| s.parse().ok())
             .unwrap_or(3);
