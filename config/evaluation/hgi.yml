@@ -160,7 +160,7 @@ metrics:
 
   # Put costs on some key combinations that are hard to describe otherwise
   manual_bigram_penalty:
-    enabled: true
+    enabled: false
     weight: 5.0
     normalization:
       type: weight_found
