@@ -86,7 +86,7 @@ base_layout:
     # Row 4, containing the modifiiers
     - - ["⇘"]
       - ["⇧"]
-      - ["\n"]
+      - ["⇧"]
       - ["⇙"]
 
   fixed_keys:
