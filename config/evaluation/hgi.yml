@@ -142,7 +142,7 @@ metrics:
     params:
       # Finger-individual weights to be multiplied with the cost
       finger_factors:
-        Thumb: 1.2
+        Thumb: 0.8
         Index: 0.8
         Middle: 1.0
         Ring: 1.1
