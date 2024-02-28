@@ -149,10 +149,10 @@ metrics:
         Pinky: 1.2
       # Factor applied if the repeat consists of a movement
       # in line of the finger "outwards", i.e. by stretching the finger
-      stretch_factor: 1.2
+      stretch_factor: 1.1
       # Factor applied if the repeat consists of a movement
       # in line of the finger "inwards", i.e. by curling the finger
-      curl_factor: 1.1
+      curl_factor: 1.2
       # Factor applied if the repeat consists of a lateral movement
       lateral_factor: 1.5
       # Cost to apply if the finger repeat happens on the same key
@@ -254,48 +254,50 @@ metrics:
       # to: Finger for second symbol of the bigram
       # cost: Cost to count for such a movement
       finger_switch_factor:
-        - { from: [Left, Pinky],   to: [Left, Ring],    cost: 4 }
-        - { from: [Left, Pinky],   to: [Left, Middle],  cost: 3 }
+        - { from: [Left, Pinky],   to: [Left, Ring],    cost: 4.0 }
+        - { from: [Left, Pinky],   to: [Left, Middle],  cost: 3.0 }
+        - { from: [Left, Pinky],   to: [Left, Index],   cost: 0.5 }
 
-        - { from: [Left, Ring],    to: [Left, Pinky],   cost: 6 }
-        - { from: [Left, Ring],    to: [Left, Middle],  cost: 1 }
-        - { from: [Left, Ring],    to: [Left, Index], cost: 0.1 }
+        - { from: [Left, Ring],    to: [Left, Pinky],   cost: 6.0 }
+        - { from: [Left, Ring],    to: [Left, Middle],  cost: 0.8 }
+        - { from: [Left, Ring],    to: [Left, Index],   cost: 0.1 }
 
-        - { from: [Left, Middle],  to: [Left, Pinky],   cost: 3 }
-        - { from: [Left, Middle],  to: [Left, Ring],    cost: 3 }
-        - { from: [Left, Middle],  to: [Left, Index], cost: 0.3 }
+        - { from: [Left, Middle],  to: [Left, Pinky],   cost: 3.0 }
+        - { from: [Left, Middle],  to: [Left, Ring],    cost: 2.0 }
+        - { from: [Left, Middle],  to: [Left, Index],   cost: 0.2 }
 
-        - { from: [Left, Index], to: [Left, Pinky],   cost: 0.1 }
-        - { from: [Left, Index], to: [Left, Ring],    cost: 0.3 }
-        - { from: [Left, Index], to: [Left, Middle],  cost: 0.9 }
+        - { from: [Left, Index],   to: [Left, Pinky],   cost: 0.1 }
+        - { from: [Left, Index],   to: [Left, Ring],    cost: 0.3 }
+        - { from: [Left, Index],   to: [Left, Middle],  cost: 0.7 }
 
-        - { from: [Right, Pinky],   to: [Right, Ring],    cost: 4 }
-        - { from: [Right, Pinky],   to: [Right, Middle],  cost: 3 }
+        - { from: [Right, Pinky],  to: [Right, Ring],   cost: 4.0 }
+        - { from: [Right, Pinky],  to: [Right, Middle], cost: 3.0 }
+        - { from: [Right, Pinky],  to: [Right, Index],  cost: 0.5 }
 
-        - { from: [Right, Ring],    to: [Right, Pinky],   cost: 6 }
-        - { from: [Right, Ring],    to: [Right, Middle],  cost: 1 }
-        - { from: [Right, Ring],    to: [Right, Index], cost: 0.1 }
+        - { from: [Right, Ring],   to: [Right, Pinky],  cost: 6.0 }
+        - { from: [Right, Ring],   to: [Right, Middle], cost: 0.8 }
+        - { from: [Right, Ring],   to: [Right, Index],  cost: 0.1 }
 
-        - { from: [Right, Middle],  to: [Right, Pinky],   cost: 3 }
-        - { from: [Right, Middle],  to: [Right, Ring],    cost: 3 }
-        - { from: [Right, Middle],  to: [Right, Index], cost: 0.3 }
+        - { from: [Right, Middle], to: [Right, Pinky],  cost: 3.0 }
+        - { from: [Right, Middle], to: [Right, Ring],   cost: 2.0 }
+        - { from: [Right, Middle], to: [Right, Index],  cost: 0.2 }
 
-        - { from: [Right, Index], to: [Right, Pinky],   cost: 0.1 }
-        - { from: [Right, Index], to: [Right, Ring],    cost: 0.3 }
-        - { from: [Right, Index], to: [Right, Middle],  cost: 0.9 }
+        - { from: [Right, Index],  to: [Right, Pinky],  cost: 0.1 }
+        - { from: [Right, Index],  to: [Right, Ring],   cost: 0.3 }
+        - { from: [Right, Index],  to: [Right, Middle], cost: 0.7 }
 
       # Finger lengths
       finger_lengths:
         Left:
           Pinky: 1
           Ring: 3
-          Middle: 5
-          Index: 2
+          Middle: 4
+          Index: 3
         Right:
           Pinky: 1
           Ring: 3
-          Middle: 5
-          Index: 2
+          Middle: 4
+          Index: 3
 
       # If the movement is directed downwards from a short towards a long
       # or upwards from a long towards a short finger,
@@ -304,7 +306,7 @@ metrics:
 
       # The cost is multiplied by the same_row_offset plus number of crossed rows.
       # If same_row_offset is zero, movement patterns on the same row have zero cost.
-      same_row_offset: 0.1
+      same_row_offset: 0.0
 
       # If the movement involves unbalancing keys (horizontally or vertically), the corresponding
       # unbalancing values are weighted with this factor and multiplied to the result.
@@ -357,7 +359,7 @@ metrics:
       # Count this factor if the starting and end key are the same (but no finger repeat)
       factor_same_key_start_end: 0.5
       # The trigram contains the index finger at least once
-      factor_contains_index: 0.5
+      factor_contains_index: 0.2
 
   # The `secondary_bigrams` metric evaluates all bigram metrics that can be computed on individual
   # bigrams (in particular not the finger- and hand-balance metrics) for the bigram resulting from
