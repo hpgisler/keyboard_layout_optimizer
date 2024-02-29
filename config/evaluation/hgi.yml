@@ -1,6 +1,10 @@
 metrics:
   # layout metrics
 
+  # The layout metric [`ShortcutKeys`] penalizes configurable letters (usually "cvxz")
+  # if they are not within the first 5 columns of the left side of the keyboard.
+  # The cost to add for each such a letter is configurable.
+
   # Specified symbols shall be located within the leftmost "n" columns of the left hand
   shortcut_keys:
     enabled: false
@@ -119,8 +123,8 @@ metrics:
 
   # bigram metrics
 
-  # If the keys corresponding to a bigram are not symmetrical on left and right hand, a cost is
-  # counted.
+  # The bigram metric [`SymmetricHandswitches`] metric assigns a negative cost to each bigram
+  # for which the two keys are symmetrical on each hand (thumbs are excluded).
   symmetric_handswitches:
     enabled: false
     weight: 1.0
@@ -130,6 +134,10 @@ metrics:
     params:
       null: null
 
+  # The bigram metric [`FingerRepeats`] incurrs a cost for bigram that uses the same finger
+  # for different keys (thumb excluded). If the finger is the index, the cost may be multiplied
+  # with a configurable factor (usually lessening the cost).
+  
   # If both keys corresponding to a bigram belong to the same finger, a cost is counted.
   # The cost can be weighted by the individual keys and if they are performed by stretching
   # or curling the finger. Also accounted for is whether there is lateral or in-line movement.
@@ -158,6 +166,8 @@ metrics:
       # Cost to apply if the finger repeat happens on the same key
       same_key_offset: 0.5
 
+  # The bigram metric [`ManualBigramPenalty`] incurrs costs if the bigram is mapped
+  # to one of a list of configurable "bad" key pairs (in terms of key locations).
   # Put costs on some key combinations that are hard to describe otherwise
   manual_bigram_penalty:
     enabled: false
@@ -240,6 +250,9 @@ metrics:
         # [[17, 2], [17, 2]]: 0.3
         # [[17, 3], [17, 3]]: 0.5
 
+  # The bigram metric [`MovementPattern`] puts cost on each bigram that is mapped to
+  # (almost) neighboring fingers. Which finger combinations come with which costs is
+  # configurable.
   # Depending on which fingers of the same hand are used to hit the keys of a bigram,
   # how many rows were crossed and in which direction the movement occurs, costs are
   # counted.
@@ -312,8 +325,10 @@ metrics:
       # unbalancing values are weighted with this factor and multiplied to the result.
       unbalancing_factor: 0.5
 
-  # If no handswitch occurs after hitting an "unbalancing" key (as defined in the keyboard's layout
-  # config), a cost is counted depending on how far the unbalancing takes place.
+  # The bigram metric [`NoHandSwitchAfterUnbalancingKey`] assigns a cost to each bigram
+  # that starts with an unbalancing key and ends on the same hand (no thumbs). The cost increases
+  # with the square of the vertical distance. If the second key is unbalancing as well
+  # and horizontally far away (more than three keys), the cost is increased even further.
   no_handswitch_after_unbalancing_key:
     enabled: true
     weight: 36.0
@@ -338,6 +353,11 @@ metrics:
     params:
       null: null
 
+  # The trigram metric [`NoHandSwithInTrigram`] counts the weights of trigrams
+  # that do not involve a handswitch (thumbs are excluded). The cost may differ depending on whether
+  # there is a direction change from the first to the second bigram within the
+  # trigram.
+
   # If there is no handswitch in a trigram, a cost is counted. The cost is multiplied by factors
   # depending on whether the three keys corresponding to the trigram are "in line" ("rolling
   # movement") or if there is a directional change.
@@ -353,7 +373,7 @@ metrics:
       # Count this factor if there is no direction change in the trigram
       factor_without_direction_change: 1.0
       # Count this factor if all characters of the trigram lie on the same key
-      factor_same_key: 0.0
+      factor_same_key: 4.0
       # Count this factor if the trigram contains at least finger repeats
       factor_contains_finger_repeat: 1.0
       # Count this factor if the starting and end key are the same (but no finger repeat)
@@ -406,8 +426,9 @@ metrics:
       # Multiply by this factor for each of the bigrams that have a lateral movement
       factor_inward: 1.0
       factor_outward: 0.2
-      exclude_rows: [3]
+      exclude_rows: [4]
 
+  # hgi: if inward roll is detected, add (or rather subtract) the cost
   oxey_inward_rolls:
     enabled: true
     weight: -2.0
