@@ -94,7 +94,7 @@ metrics:
   # Each hand's load shall be close to 50%
   hand_disbalance:
     enabled: true
-    weight: 20.0
+    weight: 10.0
     normalization:
       type: fixed
       value: 1.0
@@ -104,7 +104,7 @@ metrics:
   # Each keystroke incurs a cost (defined in the keyboard's layout config)
   key_costs:
     enabled: true
-    weight: 2.0
+    weight: 3.0
     normalization:
       type: weight_found
       value: 1.0
@@ -127,7 +127,7 @@ metrics:
   # for which the two keys are symmetrical on each hand (thumbs are excluded).
   symmetric_handswitches:
     enabled: true
-    weight: 1.0
+    weight: 0.3
     normalization:
       type: weight_found
       value: 0.02
@@ -363,7 +363,7 @@ metrics:
   # movement") or if there is a directional change.
   no_handswitch_in_trigram:
     enabled: true
-    weight: 1
+    weight: 0.5
     normalization:
       type: weight_found
       value: 0.01
@@ -381,6 +381,10 @@ metrics:
       # The trigram contains the index finger at least once
       factor_contains_index: 0.2
 
+  # The trigram metric [`SecondaryBigrams`] takes the first and last symbol of a trigram
+  # and evaluates it with all configured bigram metrics that can assign costs to
+  # individual bigrams (`individual_cost` does not return `None`).
+
   # The `secondary_bigrams` metric evaluates all bigram metrics that can be computed on individual
   # bigrams (in particular not the finger- and hand-balance metrics) for the bigram resulting from
   # the first and last symbol of the trigram. Depending on whether the trigram involves a
@@ -388,7 +392,7 @@ metrics:
   # symbols are excluded.
   secondary_bigrams:
     enabled: true
-    weight: 1
+    weight: 0.1
     normalization:
       type: weight_found
       value: 0.02
@@ -431,7 +435,7 @@ metrics:
   # hgi: trigrams: if inward roll is detected, add (or rather subtract) the cost
   oxey_inward_rolls:
     enabled: true
-    weight: -0.025
+    weight: -0.1
     normalization:
       type: weight_found
       value: 0.01
@@ -443,7 +447,7 @@ metrics:
   # hgi: trigrams: if inward roll is detected, add (or rather subtract) the cost
   oxey_outward_rolls:
     enabled: true
-    weight: -0.06
+    weight: -0.09
     normalization:
       type: weight_found
       value: 0.01
