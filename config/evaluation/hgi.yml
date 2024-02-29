@@ -104,7 +104,7 @@ metrics:
   # Each keystroke incurs a cost (defined in the keyboard's layout config)
   key_costs:
     enabled: true
-    weight: 3.0
+    weight: 2.0
     normalization:
       type: weight_found
       value: 1.0
@@ -392,15 +392,15 @@ metrics:
   # symbols are excluded.
   secondary_bigrams:
     enabled: true
-    weight: 0.1
+    weight: -0.1
     normalization:
       type: weight_found
       value: 0.02
     params:
       # Multiply the cost with this factor if no handswitch occurs in the trigram
-      factor_no_handswitch: 1.0
+      factor_no_handswitch: 2.0
       # Multiply the cost with this factor if a handswitch occurs in the trigram
-      factor_handswitch: 2.0
+      factor_handswitch: 1.0
       # Mental pauses:
       # Exclude the trirgrams which contain a mental pause and a follow up with a non-pause symbol.
       # These trigrams do not need to be optimized, because they're "designed" to contain a pause.
