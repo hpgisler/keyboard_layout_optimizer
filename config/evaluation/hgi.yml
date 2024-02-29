@@ -73,7 +73,7 @@ metrics:
   # Each finger's load shall be relative to the specified weights
   finger_balance:
     enabled: true
-    weight: 50.0
+    weight: 5.0
     normalization:
       type: fixed
       value: 1.0
@@ -94,7 +94,7 @@ metrics:
   # Each hand's load shall be close to 50%
   hand_disbalance:
     enabled: true
-    weight: 40.0
+    weight: 20.0
     normalization:
       type: fixed
       value: 1.0
@@ -104,7 +104,7 @@ metrics:
   # Each keystroke incurs a cost (defined in the keyboard's layout config)
   key_costs:
     enabled: true
-    weight: 20.0
+    weight: 2.0
     normalization:
       type: weight_found
       value: 1.0
@@ -126,11 +126,11 @@ metrics:
   # The bigram metric [`SymmetricHandswitches`] metric assigns a negative cost to each bigram
   # for which the two keys are symmetrical on each hand (thumbs are excluded).
   symmetric_handswitches:
-    enabled: false
+    enabled: true
     weight: 1.0
     normalization:
       type: weight_found
-      value: 1.0
+      value: 0.02
     params:
       null: null
 
@@ -143,28 +143,28 @@ metrics:
   # or curling the finger. Also accounted for is whether there is lateral or in-line movement.
   finger_repeats:
     enabled: true
-    weight: 780.0
+    weight: 1
     normalization:
       type: weight_found
-      value: 1.0
+      value: 0.02
     params:
       # Finger-individual weights to be multiplied with the cost
       finger_factors:
-        Thumb: 0.8
-        Index: 0.8
+        Thumb: 0.1
+        Index: 0.9
         Middle: 1.0
         Ring: 1.1
-        Pinky: 1.2
+        Pinky: 2.0
       # Factor applied if the repeat consists of a movement
       # in line of the finger "outwards", i.e. by stretching the finger
-      stretch_factor: 1.1
+      stretch_factor: 1.0
       # Factor applied if the repeat consists of a movement
       # in line of the finger "inwards", i.e. by curling the finger
-      curl_factor: 1.2
+      curl_factor: 1.0
       # Factor applied if the repeat consists of a lateral movement
       lateral_factor: 1.5
       # Cost to apply if the finger repeat happens on the same key
-      same_key_offset: 0.5
+      same_key_offset: 0.6
 
   # The bigram metric [`ManualBigramPenalty`] incurrs costs if the bigram is mapped
   # to one of a list of configurable "bad" key pairs (in terms of key locations).
@@ -258,10 +258,10 @@ metrics:
   # counted.
   movement_pattern:
     enabled: true
-    weight: 100.0
+    weight: 1.0
     normalization:
       type: weight_found
-      value: 1.0
+      value: 0.02
     params:
       # from: Finger for first symbol of the bigram
       # to: Finger for second symbol of the bigram
@@ -330,7 +330,7 @@ metrics:
   # with the square of the vertical distance. If the second key is unbalancing as well
   # and horizontally far away (more than three keys), the cost is increased even further.
   no_handswitch_after_unbalancing_key:
-    enabled: true
+    enabled: false
     weight: 36.0
     normalization:
       type: weight_found
@@ -346,10 +346,10 @@ metrics:
   # of each trigram. Their cost is multiplied and the square root of the resulting sum is taken.
   irregularity:
     enabled: true
-    weight: 8.25
+    weight: 1
     normalization:
       type: weight_found
-      value: 1.0
+      value: 0.02
     params:
       null: null
 
@@ -363,10 +363,10 @@ metrics:
   # movement") or if there is a directional change.
   no_handswitch_in_trigram:
     enabled: true
-    weight: 200.0
+    weight: 1
     normalization:
       type: weight_found
-      value: 1.0
+      value: 0.01
     params:
       # Count this factor if there is a direction change in the trigram
       factor_with_direction_change: 4.0
@@ -375,9 +375,9 @@ metrics:
       # Count this factor if all characters of the trigram lie on the same key
       factor_same_key: 4.0
       # Count this factor if the trigram contains at least finger repeats
-      factor_contains_finger_repeat: 1.0
+      factor_contains_finger_repeat: 3.0
       # Count this factor if the starting and end key are the same (but no finger repeat)
-      factor_same_key_start_end: 0.5
+      factor_same_key_start_end: 2.0
       # The trigram contains the index finger at least once
       factor_contains_index: 0.2
 
@@ -388,15 +388,15 @@ metrics:
   # symbols are excluded.
   secondary_bigrams:
     enabled: true
-    weight: 0.1
+    weight: 1
     normalization:
       type: weight_found
-      value: 1.0
+      value: 0.02
     params:
       # Multiply the cost with this factor if no handswitch occurs in the trigram
-      factor_no_handswitch: 0.7
+      factor_no_handswitch: 1.0
       # Multiply the cost with this factor if a handswitch occurs in the trigram
-      factor_handswitch: 0.8
+      factor_handswitch: 2.0
       # Mental pauses:
       # Exclude the trirgrams which contain a mental pause and a follow up with a non-pause symbol.
       # These trigrams do not need to be optimized, because they're "designed" to contain a pause.
@@ -408,43 +408,44 @@ metrics:
   # is counted. A factor is multiplied for each bigram with keys belonging to different columns.
   trigram_finger_repeats:
     enabled: false
-    weight: 10000.0
+    weight: 1.0
     normalization:
       type: weight_found
-      value: 1.0
+      value: 0.01
     params:
       # Multiply by this factor for each of the bigrams that have a lateral movement
       factor_lateral_movement: 1.2
 
   trigram_rolls:
     enabled: false
-    weight: 25000.0
+    weight: 1.0
     normalization:
       type: weight_found
-      value: 1.0
+      value: 0.01
     params:
       # Multiply by this factor for each of the bigrams that have a lateral movement
       factor_inward: 1.0
       factor_outward: 0.2
       exclude_rows: [4]
 
-  # hgi: if inward roll is detected, add (or rather subtract) the cost
+  # hgi: trigrams: if inward roll is detected, add (or rather subtract) the cost
   oxey_inward_rolls:
     enabled: true
-    weight: -2.0
+    weight: -0.025
     normalization:
-      type: weight_all
+      type: weight_found
       value: 0.01
     params:
       exclude_thumbs: true
       exclude_modifiers: true
       exclude_chars: ["\n"]
 
+  # hgi: trigrams: if inward roll is detected, add (or rather subtract) the cost
   oxey_outward_rolls:
     enabled: true
-    weight: -1.0
+    weight: -0.06
     normalization:
-      type: weight_all
+      type: weight_found
       value: 0.01
     params:
       exclude_thumbs: true
