@@ -139,6 +139,8 @@ base_layout:
   # starting from 0
   fixed_layers: [1]
 
+  grouped_layers: 1
+
   modifiers:
     - Left:
         type: hold
