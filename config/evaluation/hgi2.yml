@@ -84,8 +84,8 @@ metrics:
         [Left, Ring]: 1.8
         [Left, Middle]: 2.0
         [Left, Index]: 2.0
-        [Left, Thumb]: 6.8
-        [Right, Thumb]: 6.8
+        [Left, Thumb]: 3.0
+        [Right, Thumb]: 3.0
         [Right, Index]: 2.0
         [Right, Middle]: 2.0
         [Right, Ring]: 1.8
