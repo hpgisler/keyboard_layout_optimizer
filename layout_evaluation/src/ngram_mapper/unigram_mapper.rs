@@ -57,11 +57,11 @@ impl OnDemandUnigramMapper {
         let (mut unigram_keys_vec, not_found_weight) = map_unigrams(unigrams, layout);
 
         if layout.has_one_shot_layers() {
-            unigram_keys_vec = self.process_one_shot_layers(unigram_keys_vec, layout);
+            unigram_keys_vec = self.process_one_shot_modifiers(unigram_keys_vec, layout);
         }
 
-        let unigram_keys = if self.split_modifiers.enabled {
-            Self::split_unigram_modifiers(unigram_keys_vec, layout)
+        let unigram_keys = if self.split_modifiers.enabled && layout.has_hold_layers() {
+            Self::process_hold_modifiers(unigram_keys_vec, layout)
         } else {
             unigram_keys_vec.into_iter().collect()
         };
@@ -85,18 +85,18 @@ impl OnDemandUnigramMapper {
     ///
     /// Each unigram of a higher-layer symbol will transform into a unigram with the base-layer key and one
     /// for each modifier involved in accessing the higher layer.
-    fn split_unigram_modifiers(unigrams: UnigramIndicesVec, layout: &Layout) -> UnigramIndices {
+    fn process_hold_modifiers(unigrams: UnigramIndicesVec, layout: &Layout) -> UnigramIndices {
         let mut idx_w_map = AHashMap::with_capacity(unigrams.len() / 3);
         unigrams.into_iter().for_each(|(k, w)| {
             let (base, mods) = layout.resolve_modifiers(&k);
 
-            let mods = match mods {
-                LayerModifiers::Hold(mods) => mods,
-                _ => Vec::new(),
+            let (key, mods) = match mods {
+                LayerModifiers::Hold(mods) => (base, mods),
+                _ => (k, Vec::new()),
             };
 
             // Make sure we don't have any duplicate unigrams by adding them up.
-            TakeOneLayerKey::new(base, &mods, w)
+            TakeOneLayerKey::new(key, &mods, w)
                 .for_each(|(idx, w)| idx_w_map.insert_or_add_weight(idx, w));
 
             // if base.symbol == ' ' {
@@ -117,7 +117,7 @@ impl OnDemandUnigramMapper {
         idx_w_map
     }
 
-    fn process_one_shot_layers(
+    fn process_one_shot_modifiers(
         &self,
         unigrams: UnigramIndicesVec,
         layout: &Layout,

@@ -40,6 +40,7 @@ pub enum LayerModifierType {
     None,
     Hold,
     OneShot,
+    LongPress,
 }
 
 impl Default for LayerModifierType {
@@ -50,10 +51,7 @@ impl Default for LayerModifierType {
 
 impl LayerModifierType {
     pub fn is_some(&self) -> bool {
-        match self {
-            Self::None => false,
-            _ => true,
-        }
+        !matches!(self, Self::None)
     }
 
     pub fn is_none(&self) -> bool {
@@ -61,17 +59,15 @@ impl LayerModifierType {
     }
 
     pub fn is_hold(&self) -> bool {
-        match self {
-            Self::Hold => true,
-            _ => false,
-        }
+        matches!(self, Self::Hold)
     }
 
     pub fn is_one_shot(&self) -> bool {
-        match self {
-            Self::OneShot => true,
-            _ => false,
-        }
+        matches!(self, Self::OneShot)
+    }
+
+    pub fn is_long_press(&self) -> bool {
+        matches!(self, Self::LongPress)
     }
 }
 
@@ -83,6 +79,7 @@ impl LayerModifierType {
 pub enum LayerModifierLocations {
     Hold(Vec<ModifierLocation>),
     OneShot(Vec<ModifierLocation>),
+    LongPress,
 }
 
 impl LayerModifierLocations {
@@ -90,12 +87,14 @@ impl LayerModifierLocations {
         match self {
             Self::Hold(v) => v.iter(),
             Self::OneShot(v) => v.iter(),
+            Self::LongPress => [].iter(),
         }
     }
     pub fn layer_modifier_type(&self) -> LayerModifierType {
         match self {
             Self::Hold(_) => LayerModifierType::Hold,
             Self::OneShot(_) => LayerModifierType::OneShot,
+            Self::LongPress => LayerModifierType::LongPress,
         }
     }
 }
@@ -106,13 +105,15 @@ impl LayerModifierLocations {
 pub enum LayerModifiers {
     Hold(Vec<LayerKeyIndex>),
     OneShot(Vec<LayerKeyIndex>),
+    LongPress,
 }
 
 impl LayerModifiers {
-    pub fn layerkeys(&self) -> &[LayerKeyIndex] {
+    pub fn layerkey_indices(&self) -> &[LayerKeyIndex] {
         match self {
             Self::Hold(v) => v,
             Self::OneShot(v) => v,
+            Self::LongPress => &[],
         }
     }
 }
@@ -276,7 +277,7 @@ impl Layout {
                         ModifierLocation::Position(mp) => {
                             let base_key_idx = *pos2layerkey_index
                                 .get(mp)
-                                .ok_or(format!("Modifier position '{:?}' not a found", mp))
+                                .ok_or(format!("Modifier position '{:?}' not found", mp))
                                 .map_err(anyhow::Error::msg)?;
                             let mod_idx = *pos2mod_index
                                 .entry((layer_modifier_type, *mp))
@@ -301,7 +302,7 @@ impl Layout {
                         ModifierLocation::Symbol(c) => {
                             let base_key_idx = *char2layerkey_index
                                 .get(c)
-                                .ok_or(format!("Modifier char '{:?}' not a found", c))
+                                .ok_or(format!("Modifier char '{:?}' not found", c))
                                 .map_err(anyhow::Error::msg)?;
                             let mod_idx = *char2mod_index
                                 .entry((layer_modifier_type, *c))
@@ -331,6 +332,7 @@ impl Layout {
                     LayerModifierLocations::OneShot(_) => {
                         LayerModifiers::OneShot(resolved_mods_vec)
                     }
+                    LayerModifierLocations::LongPress => LayerModifiers::LongPress,
                 };
                 resolved_mods_per_hand.insert(*hand, resolved_mods);
             }
@@ -382,14 +384,14 @@ impl Layout {
 
                 let entry_modifier_cost: f64 = entry_layerkey
                     .modifiers
-                    .layerkeys()
+                    .layerkey_indices()
                     .iter()
                     .map(|i| layerkeys[*i as usize].key.cost)
                     .sum();
 
                 let new_modifier_cost: f64 = layerkey
                     .modifiers
-                    .layerkeys()
+                    .layerkey_indices()
                     .iter()
                     .map(|i| layerkeys[*i as usize].key.cost)
                     .sum();
@@ -440,9 +442,22 @@ impl Layout {
     #[inline(always)]
     pub fn resolve_modifiers(&self, k: &LayerKeyIndex) -> (LayerKeyIndex, LayerModifiers) {
         let lk = self.get_layerkey(k);
+
+        if matches!(lk.modifiers, LayerModifiers::LongPress) {
+            // long press does not resolve to underlying base LayerKey
+            return (*k, LayerModifiers::LongPress);
+        }
+
         let base = self.get_base_layerkey_index(k);
         let mods = lk.modifiers.clone();
         (base, mods)
+    }
+
+    /// If the layout has at least one layer configured as hold layer
+    pub fn has_hold_layers(&self) -> bool {
+        self.layerkeys
+            .iter()
+            .any(|lk| std::matches!(lk.modifiers, LayerModifiers::Hold(_)))
     }
 
     /// If the layout has at least one layer configured as one-shot layer
@@ -500,7 +515,7 @@ impl Layout {
         let key_chars: Vec<String> = self
             .key_layers
             .iter()
-            .filter_map(|layerkeys| layerkeys.get(0).map(|lk| self.get_layerkey(&lk)))
+            .filter_map(|layerkeys| layerkeys.first().map(|lk| self.get_layerkey(lk)))
             .filter(|k| !k.is_fixed)
             .map(|k| k.symbol.to_string())
             .collect();
@@ -511,7 +526,7 @@ impl Layout {
     pub fn as_text(&self) -> String {
         self.key_layers
             .iter()
-            .filter_map(|layerkeys| layerkeys.get(0).map(|lk| self.get_layerkey(&lk)))
+            .filter_map(|layerkeys| layerkeys.first().map(|lk| self.get_layerkey(lk)))
             .filter(|k| !k.is_fixed)
             .map(|k| k.symbol.to_string())
             .collect()

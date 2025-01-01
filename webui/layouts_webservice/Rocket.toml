@@ -19,6 +19,14 @@ layout_configs = [
     "crkbd",
     "../../config/keyboard/crkbd.yml",
   ],
+  [
+    "lily58",
+    "../../config/keyboard/lily58.yml",
+  ],
+  [
+    "ansi",
+    "../../config/keyboard/standard_qwerty_ansi.yml",
+  ],
 ]
 ngrams = "../../ngrams/deu_mixed_wiki_web_0.6_eng_news_typical_wiki_web_0.4"
 secret = "super_duper_secret"

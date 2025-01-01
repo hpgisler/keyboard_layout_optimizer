@@ -2,6 +2,8 @@ import config_standard_keyboard from '../../../config/keyboard/standard.yml'
 import config_ortho from '../../../config/keyboard/ortho.yml'
 import config_moonlander from '../../../config/keyboard/moonlander.yml'
 import config_crkbd from '../../../config/keyboard/crkbd.yml'
+import config_lily58 from '../../../config/keyboard/lily58.yml'
+import config_ansi from '../../../config/keyboard/standard_qwerty_ansi.yml'
 
 import eval_params from '../../../config/evaluation/default.yml'
 import genevo_opt_params from '../../../config/optimization/genetic_web.yml'
@@ -14,6 +16,8 @@ const LAYOUT_CONFIGS = {
   ortho: config_ortho,
   moonlander: config_moonlander,
   crkbd: config_crkbd,
+  lily58: config_lily58,
+  ansi: config_ansi,
 }
 
 const OPTIMIZATION_ALGORITHM_PARAMS = {
@@ -59,7 +63,7 @@ Vue.component('evaluator-app', {
 
   <b-row>
 
-    <b-col xl="4" lg="6" style="height: 450px">
+    <b-col xl="4" lg="6">
       <h2>Layout</h2>
       <b-button class="mb-2" size="sm" @click="setInput('zyuaqpbmlfjßcsieodtnrhvxüäöwg,.k')">noted</b-button>
       <b-button class="mb-2" size="sm" @click="setInput('zguaqwbdlyjßcsieomntrhvxüäöpf,.k')">miners</b-button>
@@ -71,6 +75,7 @@ Vue.component('evaluator-app', {
       <b-button class="mb-2" size="sm" @click="setInput('qwertzuiopüßasdfghjklöyxcvbnm,.ä')">qwertz</b-button>
       <b-button class="mb-2" size="sm" @click="setInput('qwfpgjluyüößarstdhneiozxcvbkm,.ä')">colemak</b-button>
       <b-button class="mb-2" size="sm" @click="setInput('qdrwbjfupüößashtgyneoizxmcvkl,.ä')">workman</b-button>
+      <b-button class="mb-2" size="sm" @click="setInput('qwertyuiop[]asdfghjkl;\\\'zxcvbnm,./')">qwerty (ANSI)</b-button>
       <b-button class="mb-2" size="sm" @click="randomInput(true)">random (std)</b-button>
       <b-button class="mb-2" size="sm" @click="randomInput(false)">random</b-button>
 
@@ -105,7 +110,7 @@ Vue.component('evaluator-app', {
 
     <b-col xl="8" lg="6">
       <h2>Settings</h2>
-        <b-overlay :show="optStep >= 0" style="height: 420px">
+        <b-overlay :show="optStep >= 0">
           <b-tabs>
             <b-tab title="Evaluation">
               <config-file :initial-content="evalParamsStr" @saved="updateEvalParams">

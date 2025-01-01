@@ -84,23 +84,24 @@ impl BigramMetric for KLADistance {
     ) -> (f64, Option<String>) {
         let mut finger_values: HandFingerMap<f64> = HandFingerMap::with_default(0.0);
 
-        let home_row_positions = FingerStates::with_positions(&layout.keyboard.home_row_positions);
+        let finger_resting_positions =
+            FingerStates::with_positions(&layout.keyboard.finger_resting_positions);
 
         bigrams.iter().for_each(|((prev_key, curr_key), weight)| {
             // collect used fingers and keys for previous symbol
-            let mut prev_used_keys = home_row_positions;
+            let mut prev_used_keys = finger_resting_positions;
             prev_used_keys.register_key(prev_key);
             if !self.ignore_modifiers {
-                prev_key.modifiers.layerkeys().iter().for_each(|k| {
+                prev_key.modifiers.layerkey_indices().iter().for_each(|k| {
                     prev_used_keys.register_key(layout.get_layerkey(k));
                 });
             }
 
             // collect used fingers and keys for currend symbol
-            let mut curr_used_keys = home_row_positions;
+            let mut curr_used_keys = finger_resting_positions;
             curr_used_keys.register_key(curr_key);
             if !self.ignore_modifiers {
-                curr_key.modifiers.layerkeys().iter().for_each(|k| {
+                curr_key.modifiers.layerkey_indices().iter().for_each(|k| {
                     curr_used_keys.register_key(layout.get_layerkey(k));
                 });
             }

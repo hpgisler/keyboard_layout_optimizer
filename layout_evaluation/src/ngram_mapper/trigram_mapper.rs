@@ -90,11 +90,11 @@ impl OnDemandTrigramMapper {
             map_trigrams(trigrams, layout, exclude_line_breaks);
 
         if layout.has_one_shot_layers() {
-            trigram_keys_vec = self.process_one_shot_layers(trigram_keys_vec, layout);
+            trigram_keys_vec = self.process_one_shot_modifiers(trigram_keys_vec, layout);
         }
 
-        let trigram_keys = if self.split_modifiers.enabled {
-            self.split_trigram_modifiers(trigram_keys_vec, layout)
+        let trigram_keys = if self.split_modifiers.enabled && layout.has_hold_layers() {
+            self.process_hold_modifiers(trigram_keys_vec, layout)
         } else {
             trigram_keys_vec.into_iter().collect()
         };
@@ -140,7 +140,7 @@ impl OnDemandTrigramMapper {
     /// trigram can be large (tens of trigrams) if multiple symbols of the trigram are accessed using multiple modifiers.
 
     // this is one of the most intensive functions of the layout evaluation
-    fn split_trigram_modifiers(
+    fn process_hold_modifiers(
         &self,
         trigrams: TrigramIndicesVec,
         layout: &Layout,
@@ -151,105 +151,95 @@ impl OnDemandTrigramMapper {
             let (base2, mods2) = layout.resolve_modifiers(&k2);
             let (base3, mods3) = layout.resolve_modifiers(&k3);
 
-            let mods1 = match mods1 {
-                LayerModifiers::Hold(mods) => mods,
-                _ => Vec::new(),
+            let (key1, mods1) = match mods1 {
+                LayerModifiers::Hold(mods) => (base1, mods),
+                _ => (k1, Vec::new()),
             };
 
-            let mods2 = match mods2 {
-                LayerModifiers::Hold(mods) => mods,
-                _ => Vec::new(),
+            let (key2, mods2) = match mods2 {
+                LayerModifiers::Hold(mods) => (base2, mods),
+                _ => (k2, Vec::new()),
             };
 
-            let mods3 = match mods3 {
-                LayerModifiers::Hold(mods) => mods,
-                _ => Vec::new(),
+            let (key3, mods3) = match mods3 {
+                LayerModifiers::Hold(mods) => (base3, mods),
+                _ => (k3, Vec::new()),
             };
 
-            let k1_take_one = TakeOneLayerKey::new(base1, &mods1, w);
-            let k2_take_one = TakeOneLayerKey::new(base2, &mods2, w);
-            let k3_take_one = TakeOneLayerKey::new(base3, &mods3, w);
+            let k1_take_one = TakeOneLayerKey::new(key1, &mods1, w);
+            let k2_take_one = TakeOneLayerKey::new(key2, &mods2, w);
+            let k3_take_one = TakeOneLayerKey::new(key3, &mods3, w);
 
             let k1_take_two =
-                TakeTwoLayerKey::new(base1, &mods1, w, self.split_modifiers.same_key_mod_factor);
+                TakeTwoLayerKey::new(key1, &mods1, w, self.split_modifiers.same_key_mod_factor);
             let k2_take_two =
-                TakeTwoLayerKey::new(base2, &mods2, w, self.split_modifiers.same_key_mod_factor);
+                TakeTwoLayerKey::new(key2, &mods2, w, self.split_modifiers.same_key_mod_factor);
             let k3_take_two =
-                TakeTwoLayerKey::new(base3, &mods3, w, self.split_modifiers.same_key_mod_factor);
+                TakeTwoLayerKey::new(key3, &mods3, w, self.split_modifiers.same_key_mod_factor);
 
             k1_take_one.clone().for_each(|(e1, _)| {
                 k2_take_one.clone().for_each(|(e2, _)| {
                     k3_take_one.clone().for_each(|(e3, _)| {
-                        if (e1 != e2) && (e2 != e3) {
-                            // log::trace!(
-                            //     "one each:                    {}{}{}",
-                            //     layout.get_layerkey(&e1).symbol,
-                            //     layout.get_layerkey(&e2).symbol,
-                            //     layout.get_layerkey(&e3).symbol,
-                            // );
-                            trigram_w_map.insert_or_add_weight((e1, e2, e3), w);
-                        }
+                        // log::trace!(
+                        //     "one each:                    {}{}{}",
+                        //     layout.get_layerkey(&e1).symbol,
+                        //     layout.get_layerkey(&e2).symbol,
+                        //     layout.get_layerkey(&e3).symbol,
+                        // );
+                        trigram_w_map.insert_or_add_weight((e1, e2, e3), w);
                     });
                 });
             });
 
             k1_take_two.for_each(|((e1, e2), w1)| {
                 k2_take_one.clone().for_each(|(e3, _)| {
-                    if (e1 != e2) && (e2 != e3) {
-                        // log::trace!(
-                        //     "two of first, one of second: {}{}{}",
-                        //     layout.get_layerkey(&e1).symbol,
-                        //     layout.get_layerkey(&e2).symbol,
-                        //     layout.get_layerkey(&e3).symbol,
-                        // );
-                        trigram_w_map.insert_or_add_weight((e1, e2, e3), w1);
-                    }
+                    // log::trace!(
+                    //     "two of first, one of second: {}{}{}",
+                    //     layout.get_layerkey(&e1).symbol,
+                    //     layout.get_layerkey(&e2).symbol,
+                    //     layout.get_layerkey(&e3).symbol,
+                    // );
+                    trigram_w_map.insert_or_add_weight((e1, e2, e3), w1);
                 });
             });
 
             k1_take_one.for_each(|(e1, _)| {
                 k2_take_two.clone().for_each(|((e2, e3), w1)| {
-                    if (e1 != e2) && (e2 != e3) {
-                        // log::trace!(
-                        //     "one of first, two of second: {}{}{}",
-                        //     layout.get_layerkey(&e1).symbol,
-                        //     layout.get_layerkey(&e2).symbol,
-                        //     layout.get_layerkey(&e3).symbol,
-                        // );
-                        trigram_w_map.insert_or_add_weight((e1, e2, e3), w1);
-                    }
+                    // log::trace!(
+                    //     "one of first, two of second: {}{}{}",
+                    //     layout.get_layerkey(&e1).symbol,
+                    //     layout.get_layerkey(&e2).symbol,
+                    //     layout.get_layerkey(&e3).symbol,
+                    // );
+                    trigram_w_map.insert_or_add_weight((e1, e2, e3), w1);
                 });
             });
 
             k2_take_two.for_each(|((e1, e2), w1)| {
                 k3_take_one.clone().for_each(|(e3, _)| {
-                    if (e1 != e2) && (e2 != e3) {
-                        // log::trace!(
-                        //     "two of second, one of third: {}{}{}",
-                        //     layout.get_layerkey(&e1).symbol,
-                        //     layout.get_layerkey(&e2).symbol,
-                        //     layout.get_layerkey(&e3).symbol,
-                        // );
-                        trigram_w_map.insert_or_add_weight((e1, e2, e3), w1);
-                    }
+                    // log::trace!(
+                    //     "two of second, one of third: {}{}{}",
+                    //     layout.get_layerkey(&e1).symbol,
+                    //     layout.get_layerkey(&e2).symbol,
+                    //     layout.get_layerkey(&e3).symbol,
+                    // );
+                    trigram_w_map.insert_or_add_weight((e1, e2, e3), w1);
                 });
             });
 
             k2_take_one.for_each(|(e1, _)| {
                 k3_take_two.clone().for_each(|((e2, e3), w1)| {
-                    if (e1 != e2) && (e2 != e3) {
-                        // log::trace!(
-                        //     "one of second, two of third: {}{}{}",
-                        //     layout.get_layerkey(&e1).symbol,
-                        //     layout.get_layerkey(&e2).symbol,
-                        //     layout.get_layerkey(&e3).symbol,
-                        // );
-                        trigram_w_map.insert_or_add_weight((e1, e2, e3), w1);
-                    }
+                    // log::trace!(
+                    //     "one of second, two of third: {}{}{}",
+                    //     layout.get_layerkey(&e1).symbol,
+                    //     layout.get_layerkey(&e2).symbol,
+                    //     layout.get_layerkey(&e3).symbol,
+                    // );
+                    trigram_w_map.insert_or_add_weight((e1, e2, e3), w1);
                 });
             });
 
-            TakeThreeLayerKey::new(base1, &mods1, w, self.split_modifiers.same_key_mod_factor)
+            TakeThreeLayerKey::new(key1, &mods1, w, self.split_modifiers.same_key_mod_factor)
                 .for_each(|(e, w)| {
                     // log::trace!(
                     //     "three of first:              {}{}{}",
@@ -260,7 +250,7 @@ impl OnDemandTrigramMapper {
                     trigram_w_map.insert_or_add_weight(e, w);
                 });
 
-            TakeThreeLayerKey::new(base2, &mods2, w, self.split_modifiers.same_key_mod_factor)
+            TakeThreeLayerKey::new(key2, &mods2, w, self.split_modifiers.same_key_mod_factor)
                 .for_each(|(e, w)| {
                     // log::trace!(
                     //     "three of second:             {}{}{}",
@@ -271,7 +261,7 @@ impl OnDemandTrigramMapper {
                     trigram_w_map.insert_or_add_weight(e, w);
                 });
 
-            TakeThreeLayerKey::new(base3, &mods3, w, self.split_modifiers.same_key_mod_factor)
+            TakeThreeLayerKey::new(key3, &mods3, w, self.split_modifiers.same_key_mod_factor)
                 .for_each(|(e, w)| {
                     // log::trace!(
                     //     "three of third:              {}{}{}",
@@ -286,7 +276,7 @@ impl OnDemandTrigramMapper {
         trigram_w_map
     }
 
-    fn process_one_shot_layers(
+    fn process_one_shot_modifiers(
         &self,
         trigrams: TrigramIndicesVec,
         layout: &Layout,
